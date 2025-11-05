@@ -1,0 +1,86 @@
+.libros-container {
+    padding: 90px 50px;
+    color: black;
+    background-color: white;
+    min-height: 100vh;
+  
+    h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+  
+    .actions {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+  
+      .btn {
+        background-color: #00bcd4;
+        border: none;
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+  
+        &:hover {
+          background-color: #0097a7;
+        }
+  
+        &.prestamo {
+          background-color: #4caf50;
+  
+          &:hover {
+            background-color: #3e8e41;
+          }
+        }
+  
+        &.devuelto {
+          background-color: #ff9800;
+  
+          &:hover {
+            background-color: #e68900;
+          }
+        }
+      }
+    }
+  
+    .libros-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #f7ead9;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+      }
+  
+      th {
+        background-color: #e1d2a9;
+        color: #333;
+      }
+  
+      tr:nth-child(odd) {
+        background-color: #fff8ec; // tono claro
+      }
+  
+      tr:nth-child(even) {
+        background-color: #f8eedc; // tono más claro y suave
+      }      
+  
+      tr:hover {
+        background-color: #f3e6c6; // tono más claro y cálido
+        transition: background 0.2s ease;
+      }
+  
+      .prestado {
+        color: #ff4f4f;
+        font-weight: bold;
+      }
+    }
+  }
+  

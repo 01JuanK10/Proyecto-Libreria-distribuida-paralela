@@ -1,0 +1,36 @@
+<div class="libros-container">
+  
+    <div class="actions">
+      <button class="btn agregar" (click)="abrirModalNuevoLibro()">Agregar nuevo libro</button>
+      <button class="btn prestamo" (click)="registrarPrestamo()">Registrar préstamo</button>
+      <button class="btn devuelto" (click)="marcarDevuelto()">Marcar como devuelto</button>
+    </div>
+  
+    <table class="libros-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Autor</th>
+          <th>Editorial</th>
+          <th>Género</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (libro of libros; track libro.id) {
+          <tr>
+            <td>{{ libro.id }}</td>
+            <td>{{ libro.titulo }}</td>
+            <td>{{ libro.autor }}</td>
+            <td>{{ libro.editorial }}</td>
+            <td>{{ libro.genero }}</td>
+            <td [class.prestado]="libro.prestado" >
+              {{ libro.prestado ? 'Prestado' : 'Disponible' }}
+            </td>
+          </tr>
+        }
+      </tbody>      
+    </table>
+  </div>
+  
