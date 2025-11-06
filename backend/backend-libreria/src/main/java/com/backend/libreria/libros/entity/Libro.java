@@ -1,13 +1,12 @@
 package com.backend.libreria.libros.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.backend.libreria.clientes.entity.Cliente;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "libros")
 public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -18,7 +17,8 @@ public class Libro {
     private String genero;
     private boolean prestado;
 
-    //private String nombrePersona;
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 
-    // Getters y setters
 }
