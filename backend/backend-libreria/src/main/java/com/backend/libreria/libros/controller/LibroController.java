@@ -1,7 +1,8 @@
 package com.backend.libreria.libros.controller;
 
-import com.backend.libreria.libros.dto.LibroRequest;
-import com.backend.libreria.libros.dto.LibroResponse;
+import com.backend.libreria.clientes.entity.Cliente;
+import com.backend.libreria.clientes.service.impl.ClienteService;
+import com.backend.libreria.libros.dto.*;
 import com.backend.libreria.libros.entity.Libro;
 import com.backend.libreria.libros.service.base.ILibroService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 public class LibroController {
 
     private final ILibroService libroService;
+    private final ClienteService clienteService;
 
     @PostMapping
     public ResponseEntity<LibroResponse> create(@RequestBody LibroRequest request) {
@@ -97,4 +99,55 @@ public class LibroController {
         libroService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/prestar")
+    public ResponseEntity<PrestamoResponse> prestarLibro(@RequestBody PrestamoRequest request) {
+        Libro libro = libroService.findById(request.libroId());
+        if (libro.isPrestado()) {
+            throw new RuntimeException("El libro ya está prestado");
+        }
+
+        Cliente cliente = clienteService.findById(request.clienteCc());
+        libro.setPrestado(true);
+        libro.setCliente(cliente);
+
+        Libro actualizado = libroService.update(libro);
+
+        PrestamoResponse response = new PrestamoResponse(
+                actualizado.getId(),
+                actualizado.getTitulo(),
+                actualizado.isPrestado(),
+                cliente.getCc(),
+                cliente.getNombre()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/devolver")
+    public ResponseEntity<PrestamoResponse> devolverLibro(@RequestBody DevolucionRequest request) {
+        Libro libro = libroService.findById(request.libroId());
+
+        if (!libro.isPrestado()) {
+            throw new RuntimeException("El libro no está actualmente prestado");
+        }
+
+        Cliente cliente = libro.getCliente();
+        libro.setPrestado(false);
+        libro.setCliente(null);
+
+        Libro actualizado = libroService.update(libro);
+
+        PrestamoResponse response = new PrestamoResponse(
+                actualizado.getId(),
+                actualizado.getTitulo(),
+                actualizado.isPrestado(),
+                cliente != null ? cliente.getCc() : null,
+                cliente != null ? cliente.getNombre() : null
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }
