@@ -35,3 +35,80 @@
     </table>
   </div>
   
+  <app-modal [title]="modalTitle" [isVisible]="showModal" >
+
+    <!-- FORMULARIO PARA AGREGAR -->
+    @if (accion === 'agregar') {
+      <form>
+        <label>Id:</label>
+        <input type="text" [(ngModel)]="nuevoLibro.id" name="id" />
+        <br />
+        <label>Título:</label>
+        <input type="text" [(ngModel)]="nuevoLibro.titulo" name="titulo" />
+        <br />
+        <label>Autor:</label>
+        <input type="text" [(ngModel)]="nuevoLibro.autor" name="autor" />
+        <br />
+        <label>Editorial:</label>
+        <input type="number" [(ngModel)]="nuevoLibro.editorial" name="editorial" />
+        <br />
+        <label>Género:</label>
+        <input type="number" [(ngModel)]="nuevoLibro.genero" name="genero" />
+      </form>
+    }
+    
+  <!-- FORMULARIO PARA REGISTRAR PRÉSTAMO -->
+  @if (accion === 'registrarPrestamo') {
+    <form>
+      <label>ID del Libro:</label>
+      <input 
+        type="number" 
+        [(ngModel)]="libroId" 
+        name="libroId" 
+        (blur)="cargarDatosLibro()" 
+        placeholder="Ingrese ID del libro" 
+      />
+      <br />
+
+      <label>Título:</label>
+      <input type="text" [(ngModel)]="libroSeleccionado.titulo" name="titulo" readonly />
+      <br />
+
+      <label>Autor:</label>
+      <input type="text" [(ngModel)]="libroSeleccionado.autor" name="autor" readonly />
+      <br />
+
+      <label>Editorial:</label>
+      <input type="text" [(ngModel)]="libroSeleccionado.editorial" name="editorial" readonly />
+      <br />
+
+      <hr />
+
+      <label>CC del Cliente:</label>
+      <input 
+        type="text" 
+        [(ngModel)]="clienteCC" 
+        name="clienteCC" 
+        (blur)="cargarDatosCliente()" 
+        placeholder="Ingrese CC del cliente" 
+      />
+      <br />
+
+      <label>Nombre:</label>
+      <input type="text" [(ngModel)]="clienteSeleccionado.nombre" name="nombre" readonly />
+      <br />
+
+      <label>Apellido:</label>
+      <input type="text" [(ngModel)]="clienteSeleccionado.apellido" name="apellido" readonly />
+      <br />
+    </form>
+  }
+  
+    <!-- CONFIRMACIÓN PARA ELIMINAR -->
+    <p *ngIf="accion === 'eliminar'">¿Seguro que deseas eliminar este libro?</p>
+  
+    <div class="actions">
+      <button class="btn confirmar" >Confirmar</button>
+    </div>
+  
+  </app-modal>

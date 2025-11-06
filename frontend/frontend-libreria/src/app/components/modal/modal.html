@@ -1,18 +1,15 @@
 @if (isVisible) {
-    <div class="modal-backdrop" (click)="close()">
+    <div class="modal-backdrop">
         <div class="modal-content" (click)="$event.stopPropagation()">
         <header class="modal-header">
             <h2>{{ title }}</h2>
-            <button class="close-btn" (click)="close()">×</button>
+            <button class="close-btn" (click)="cerrarModal()">×</button>
         </header>
 
         <main class="modal-body">
             <ng-content></ng-content>
         </main>
 
-        <footer class="modal-footer">
-            <button (click)="close()">Cerrar</button>
-        </footer>
         </div>
     </div>
 }
