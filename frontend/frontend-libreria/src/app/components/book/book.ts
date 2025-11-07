@@ -61,7 +61,16 @@ export class Book implements OnInit{
       editorial: '',
       genero: ''
     };
-    
+  }
+
+  confirmarAccion() {
+    // Aquí puedes colocar la lógica para guardar el libro o lo que necesites
+    console.log('Acción confirmada:', this.nuevoLibro);
+    // Por ejemplo, podrías emitir un evento o cerrar el modal
+  }
+
+  cerrarModal() {
+    this.showModal = false;
   }
 
   registrarPrestamo() {
