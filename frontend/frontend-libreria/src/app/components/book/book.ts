@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../modal/modal';
+import Swal from 'sweetalert2';
 
 interface Libro {
   id: number;
@@ -11,13 +12,19 @@ interface Libro {
   prestado: boolean;
 }
 
+interface Cliente {
+  cc: number;
+  nombre: string;
+  apellido: string;
+}
+
 @Component({
   selector: 'app-book',
   imports: [FormsModule, Modal],
   templateUrl: './book.html',
   styleUrl: './book.scss',
 })
-export class Book implements OnInit{
+export class Book implements OnInit {
   showModal = false;
   accion = '';
   modalTitle = '';
@@ -35,17 +42,16 @@ export class Book implements OnInit{
     { id: 2, titulo: 'Don Quijote de la Mancha', autor: 'Miguel de Cervantes', editorial: 'Francisco de Robles', genero: 'Novela', prestado: true }
   ];
 
-  clientes = [
+  clientes: Cliente[] = [
     { cc: 101, nombre: 'Laura', apellido: 'Gómez' },
     { cc: 102, nombre: 'Carlos', apellido: 'Ruiz' }
   ];
-  
-  libroId = 0;
-  clienteCC = 0;
 
-  libroSeleccionado = { titulo: '', autor: '', editorial: '' };
-  clienteSeleccionado = { nombre: '', apellido: '' };
+  libroId: number | null = null;
+  clienteCC: number | null = null;
 
+  libroSeleccionado: Partial<Libro> = { titulo: '', autor: '', editorial: '' };
+  clienteSeleccionado: Partial<Cliente> = { nombre: '', apellido: '' };
 
   ngOnInit(): void {}
 
@@ -53,56 +59,88 @@ export class Book implements OnInit{
     this.accion = 'agregar';
     this.modalTitle = 'Agregar libro';
     this.showModal = true;
-    
-    this.nuevoLibro = {
-      id: '',
-      titulo: '',
-      autor: '',
-      editorial: '',
-      genero: ''
-    };
-    
+
+    this.nuevoLibro = { id: '', titulo: '', autor: '', editorial: '', genero: '' };
   }
 
+  confirmarAccion() {
+    console.log('Acción confirmada:', this.nuevoLibro);
+    Swal.fire({
+      icon: 'success',
+      title: 'Libro agregado',
+      text: `El libro "${this.nuevoLibro.titulo}" se ha agregado correctamente.`,
+      confirmButtonColor: '#28a745'
+    });
+    this.cerrarModal();
+  }
+
+  cerrarModal() {
+    this.showModal = false;
+  }
+
+  // 📗 Modal de préstamo
   registrarPrestamo() {
     this.accion = 'registrarPrestamo';
     this.modalTitle = 'Registrar préstamo de libro';
     this.showModal = true;
-
-    this.cargarDatosLibro();
-    this.cargarDatosCliente();
-
   }
 
   cargarDatosLibro() {
     const libro = this.libros.find(l => l.id === this.libroId);
     if (libro) {
-      this.libroSeleccionado = { 
-        titulo: libro.titulo, 
-        autor: libro.autor, 
-        editorial: libro.editorial 
-      };
+      this.libroSeleccionado = libro;
     } else {
       this.libroSeleccionado = { titulo: '', autor: '', editorial: '' };
-      alert('Libro no encontrado');
+      Swal.fire({
+        icon: 'error',
+        title: 'Libro no encontrado',
+        text: `No existe ningún libro con el ID ${this.libroId}.`,
+        confirmButtonColor: '#d33'
+      });
     }
   }
 
   cargarDatosCliente() {
     const cliente = this.clientes.find(c => c.cc === this.clienteCC);
     if (cliente) {
-      this.clienteSeleccionado = { 
-        nombre: cliente.nombre, 
-        apellido: cliente.apellido 
-      };
+      this.clienteSeleccionado = cliente;
     } else {
       this.clienteSeleccionado = { nombre: '', apellido: '' };
-      alert('Cliente no encontrado');
+      Swal.fire({
+        icon: 'error',
+        title: 'Cliente no encontrado',
+        text: `No existe ningún cliente con la cédula ${this.clienteCC}.`,
+        confirmButtonColor: '#d33'
+      });
     }
   }
 
+  confirmarAccionPrestamo() {
+    if (!this.libroSeleccionado?.titulo || !this.clienteSeleccionado?.nombre) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Faltan datos',
+        text: 'Debes ingresar IDs válidos para el libro y el cliente antes de registrar el préstamo.',
+        confirmButtonColor: '#f0ad4e'
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Nuevo prestamo registrado',
+      text: `El libro se ha prestado correctamente.`,
+      confirmButtonColor: '#28a745'
+    });
+    this.cerrarModal();
+  }
+
   marcarDevuelto() {
-    alert('Marcar libro como devuelto');
+    Swal.fire({
+      icon: 'info',
+      title: 'Devolución registrada',
+      text: 'El libro se ha marcado como devuelto.',
+      confirmButtonColor: '#00bcd4'
+    });
   }
 }
-
