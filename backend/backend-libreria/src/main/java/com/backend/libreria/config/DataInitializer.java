@@ -23,72 +23,59 @@ public class DataInitializer {
             // CLIENTES INICIALES
             // ==============================
             if (clienteRepository.count() == 0) {
-                Cliente cliente1 = new Cliente();
-                cliente1.setCc(1001L);
-                cliente1.setNombre("Laura");
-                cliente1.setApellido("Martínez");
-                cliente1.setDireccion("Calle 12 #4-56");
-                cliente1.setTelefono(3005678901L);
+                Cliente c1 = new Cliente(1001L, "Juan", "Pérez", "Calle 10 #1-11", 3001111111L, null);
+                Cliente c2 = new Cliente(1002L, "María", "Gómez", "Carrera 20 #2-22", 3002222222L, null);
+                Cliente c3 = new Cliente(1003L, "Carlos", "Ruiz", "Avenida 30 #3-33", 3003333333L, null);
+                Cliente c4 = new Cliente(1004L, "Laura", "Martínez", "Calle 40 #4-44", 3004444444L, null);
+                Cliente c5 = new Cliente(1005L, "Andrés", "Salazar", "Carrera 50 #5-55", 3005555555L, null);
 
-                Cliente cliente2 = new Cliente();
-                cliente2.setCc(1002L);
-                cliente2.setNombre("Carlos");
-                cliente2.setApellido("Ramírez");
-                cliente2.setDireccion("Carrera 45 #10-23");
-                cliente2.setTelefono(3126789012L);
-
-                Cliente cliente3 = new Cliente();
-                cliente3.setCc(1003L);
-                cliente3.setNombre("María");
-                cliente3.setApellido("González");
-                cliente3.setDireccion("Avenida 30 #5-12");
-                cliente3.setTelefono(3204567890L);
-
-                clienteRepository.saveAll(List.of(cliente1, cliente2, cliente3));
-                System.out.println("Clientes iniciales insertados");
+                clienteRepository.saveAll(List.of(c1, c2, c3, c4, c5));
+                System.out.println("✅ Clientes iniciales insertados");
             }
 
             // ==============================
             // LIBROS INICIALES
             // ==============================
             if (libroRepository.count() == 0) {
-                Libro l1 = new Libro();
-                l1.setTitulo("Cien años de soledad");
-                l1.setAutor("Gabriel García Márquez");
-                l1.setEditorial("Sudamericana");
-                l1.setGenero("Realismo mágico");
-                l1.setPrestado(false);
 
-                Libro l2 = new Libro();
-                l2.setTitulo("El amor en los tiempos del cólera");
-                l2.setAutor("Gabriel García Márquez");
-                l2.setEditorial("Oveja Negra");
-                l2.setGenero("Romance");
-                l2.setPrestado(false);
+                // Obtener clientes
+                List<Cliente> clientes = clienteRepository.findAll();
+                Cliente c1 = clientes.get(0);
+                Cliente c2 = clientes.get(1);
+                Cliente c3 = clientes.get(2);
 
-                Libro l3 = new Libro();
-                l3.setTitulo("La Odisea");
-                l3.setAutor("Homero");
-                l3.setEditorial("Alianza Editorial");
-                l3.setGenero("Épico");
-                l3.setPrestado(false);
+                // Libros
+                List<Libro> libros = List.of(
+                        new Libro(null, "Cien años de soledad", "Gabriel García Márquez", "Sudamericana", "Novela", true, c1),
+                        new Libro(null, "El amor en los tiempos del cólera", "Gabriel García Márquez", "Oveja Negra", "Novela", true, c1),
+                        new Libro(null, "Crónica de una muerte anunciada", "Gabriel García Márquez", "Sudamericana", "Novela", true, c1),
 
-                Libro l4 = new Libro();
-                l4.setTitulo("1984");
-                l4.setAutor("George Orwell");
-                l4.setEditorial("Secker & Warburg");
-                l4.setGenero("Distopía");
-                l4.setPrestado(false);
+                        new Libro(null, "Breve historia del tiempo", "Stephen Hawking", "Planeta", "Ciencia", true, c2),
+                        new Libro(null, "El universo en una cáscara de nuez", "Stephen Hawking", "Planeta", "Ciencia", true, c2),
 
-                Libro l5 = new Libro();
-                l5.setTitulo("El principito");
-                l5.setAutor("Antoine de Saint-Exupéry");
-                l5.setEditorial("Reynal & Hitchcock");
-                l5.setGenero("Fábula");
-                l5.setPrestado(false);
+                        new Libro(null, "La historia del tiempo", "Carl Sagan", "Debate", "Ciencia", false, null),
+                        new Libro(null, "Cosmos", "Carl Sagan", "Planeta", "Ciencia", false, null),
 
-                libroRepository.saveAll(List.of(l1, l2, l3, l4, l5));
-                System.out.println("Libros iniciales insertados");
+                        new Libro(null, "La historia de Roma", "Mary Beard", "Crítica", "Historia", true, c3),
+                        new Libro(null, "Los orígenes del mundo moderno", "Robert Marks", "Ariel", "Historia", false, null),
+                        new Libro(null, "La Segunda Guerra Mundial", "Antony Beevor", "Crítica", "Historia", false, null),
+
+                        new Libro(null, "1984", "George Orwell", "Secker & Warburg", "Distopía", false, null),
+                        new Libro(null, "Rebelión en la granja", "George Orwell", "Penguin", "Distopía", false, null),
+
+                        new Libro(null, "Física para todos", "Paul Hewitt", "Pearson", "Ciencia", true, c3),
+                        new Libro(null, "El origen de las especies", "Charles Darwin", "Murray", "Ciencia", false, null),
+
+                        new Libro(null, "La Iliada", "Homero", "Alianza", "Historia", false, null),
+                        new Libro(null, "La Odisea", "Homero", "Alianza", "Historia", false, null),
+
+                        new Libro(null, "El principito", "Antoine de Saint-Exupéry", "Reynal & Hitchcock", "Fábula", false, null),
+                        new Libro(null, "Don Quijote de la Mancha", "Miguel de Cervantes", "Espasa", "Novela", true, c2),
+                        new Libro(null, "Rayuela", "Julio Cortázar", "Sudamericana", "Novela", true, c3),
+                        new Libro(null, "Pedro Páramo", "Juan Rulfo", "Fondo de Cultura Económica", "Novela", false, null)
+                );
+
+                libroRepository.saveAll(libros);
             }
 
             System.out.println("Datos iniciales cargados correctamente en la base de datos.");
