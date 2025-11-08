@@ -2,12 +2,15 @@ package com.backend.libreria.clientes.entity;
 
 import com.backend.libreria.libros.entity.Libro;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "clientes")
 public class Cliente {
 
