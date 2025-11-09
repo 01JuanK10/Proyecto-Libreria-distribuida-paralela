@@ -2,10 +2,13 @@ package com.backend.libreria.libros.entity;
 
 import com.backend.libreria.clientes.entity.Cliente;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "libros")
 public class Libro {
     @Id
