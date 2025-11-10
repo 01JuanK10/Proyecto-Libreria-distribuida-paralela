@@ -65,6 +65,7 @@ export class Book implements OnInit {
 
   confirmarAccion() {
     console.log('Acción confirmada:', this.nuevoLibro);
+    this.limpiarCampos();
     Swal.fire({
       icon: 'success',
       title: 'Libro agregado',
@@ -126,6 +127,7 @@ export class Book implements OnInit {
       return;
     }
 
+    this.limpiarCampos();
     Swal.fire({
       icon: 'success',
       title: 'Nuevo prestamo registrado',
@@ -136,11 +138,45 @@ export class Book implements OnInit {
   }
 
   marcarDevuelto() {
+    this.accion = 'registrarDevolucion';
+    this.modalTitle = 'Registrar devolución';
+    this.showModal = true;
+  }
+
+  confirmarAccionDevolucion() {
+    if (!this.libroSeleccionado?.titulo || !this.clienteSeleccionado?.nombre) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Faltan datos',
+        text: 'Debes ingresar IDs válidos para el libro y el cliente antes de registrar la devolución.',
+        confirmButtonColor: '#f0ad4e'
+      });
+      return;
+    }
+
+    this.limpiarCampos();
     Swal.fire({
-      icon: 'info',
+      icon: 'success',
       title: 'Devolución registrada',
-      text: 'El libro se ha marcado como devuelto.',
-      confirmButtonColor: '#00bcd4'
+      text: `El libro se ha devuelto correctamente.`,
+      confirmButtonColor: '#28a745'
     });
+    this.cerrarModal();
+  }
+
+  limpiarCampos() {
+    this.nuevoLibro = {
+      id: '',
+      titulo: '',
+      autor: '',
+      editorial: '',
+      genero: ''
+    };
+  
+    this.libroId = null;
+    this.clienteCC = null;
+  
+    this.libroSeleccionado = { titulo: '', autor: '', editorial: '' };
+    this.clienteSeleccionado = { nombre: '', apellido: '' };
   }
 }
