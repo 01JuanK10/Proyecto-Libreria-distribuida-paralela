@@ -1,0 +1,64 @@
+services:
+
+  db:
+    image: postgres:latest
+    restart: always
+    container_name: libreria-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: libreriaprod
+    ports:
+      - "5432:5432"
+    networks:
+      - libreria
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d libreriaprod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  backend:
+    build:
+      context: ../backend/backend-libreria
+      dockerfile: Dockerfile
+    container_name: libreria-backend
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SERVER_PORT: ${SERVER_PORT}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    expose:
+      - "${SERVER_PORT}"
+    networks:
+      - libreria
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: libreria-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "82:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - libreria
+
+# volumes:
+#   postgres_data:
+
+networks:
+  libreria:
+    driver: bridge
