@@ -79,7 +79,6 @@ export class Book implements OnInit {
     this.showModal = false;
   }
 
-  // 📗 Modal de préstamo
   registrarPrestamo() {
     this.accion = 'registrarPrestamo';
     this.modalTitle = 'Registrar préstamo de libro';
