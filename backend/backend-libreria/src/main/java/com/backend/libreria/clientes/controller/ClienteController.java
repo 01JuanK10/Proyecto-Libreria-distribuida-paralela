@@ -5,6 +5,7 @@ import com.backend.libreria.clientes.dto.ClienteResponse;
 import com.backend.libreria.clientes.entity.Cliente;
 import com.backend.libreria.clientes.service.base.IClienteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,24 +19,27 @@ public class ClienteController {
     private final IClienteService clienteService;
 
     @PostMapping
-    public ResponseEntity<ClienteResponse> create(@RequestBody ClienteRequest request) {
-        Cliente cliente = new Cliente();
-        cliente.setCc(request.cc());
-        cliente.setNombre(request.nombre());
-        cliente.setApellido(request.apellido());
-        cliente.setDireccion(request.direccion());
-        cliente.setTelefono(request.telefono());
+    public ResponseEntity<?> create(@RequestBody ClienteRequest request) {
+        try {
+            Cliente cliente = new Cliente();
+            cliente.setCc(request.cc());
+            cliente.setNombre(request.nombre());
+            cliente.setApellido(request.apellido());
+            cliente.setDireccion(request.direccion());
+            cliente.setTelefono(request.telefono());
 
-        Cliente saved = clienteService.create(cliente);
-        ClienteResponse response = new ClienteResponse(
-                saved.getCc(),
-                saved.getNombre(),
-                saved.getApellido(),
-                saved.getDireccion(),
-                saved.getTelefono()
-        );
-
-        return ResponseEntity.ok(response);
+            Cliente saved = clienteService.create(cliente);
+            ClienteResponse response = new ClienteResponse(
+                    saved.getCc(),
+                    saved.getNombre(),
+                    saved.getApellido(),
+                    saved.getDireccion(),
+                    saved.getTelefono()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
     @GetMapping
@@ -49,47 +53,56 @@ public class ClienteController {
                         cliente.getTelefono()
                 ))
                 .toList();
-
         return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{cc}")
-    public ResponseEntity<ClienteResponse> getById(@PathVariable Long cc) {
-        Cliente cliente = clienteService.findById(cc);
-        ClienteResponse response = new ClienteResponse(
-                cliente.getCc(),
-                cliente.getNombre(),
-                cliente.getApellido(),
-                cliente.getDireccion(),
-                cliente.getTelefono()
-        );
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> getById(@PathVariable Long cc) {
+        try {
+            Cliente cliente = clienteService.findById(cc);
+            ClienteResponse response = new ClienteResponse(
+                    cliente.getCc(),
+                    cliente.getNombre(),
+                    cliente.getApellido(),
+                    cliente.getDireccion(),
+                    cliente.getTelefono()
+            );
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
 
     @PutMapping("/{cc}")
-    public ResponseEntity<ClienteResponse> update(@PathVariable Long cc, @RequestBody ClienteRequest request) {
-        Cliente cliente = clienteService.findById(cc);
-        cliente.setNombre(request.nombre());
-        cliente.setApellido(request.apellido());
-        cliente.setDireccion(request.direccion());
-        cliente.setTelefono(request.telefono());
+    public ResponseEntity<?> update(@PathVariable Long cc, @RequestBody ClienteRequest request) {
+        try {
+            Cliente cliente = clienteService.findById(cc);
+            cliente.setNombre(request.nombre());
+            cliente.setApellido(request.apellido());
+            cliente.setDireccion(request.direccion());
+            cliente.setTelefono(request.telefono());
 
-        Cliente updated = clienteService.update(cliente);
-
-        ClienteResponse response = new ClienteResponse(
-                updated.getCc(),
-                updated.getNombre(),
-                updated.getApellido(),
-                updated.getDireccion(),
-                updated.getTelefono()
-        );
-
-        return ResponseEntity.ok(response);
+            Cliente updated = clienteService.update(cliente);
+            ClienteResponse response = new ClienteResponse(
+                    updated.getCc(),
+                    updated.getNombre(),
+                    updated.getApellido(),
+                    updated.getDireccion(),
+                    updated.getTelefono()
+            );
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
 
     @DeleteMapping("/{cc}")
-    public ResponseEntity<Void> delete(@PathVariable Long cc) {
-        clienteService.delete(cc);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> delete(@PathVariable Long cc) {
+        try {
+            clienteService.delete(cc);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
     }
 }
