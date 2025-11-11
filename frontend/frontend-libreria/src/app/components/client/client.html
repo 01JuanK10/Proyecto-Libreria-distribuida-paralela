@@ -25,8 +25,8 @@
           <td>{{ cliente.direccion }}</td>
           <td>{{ cliente.telefono }}</td>
           <td>
-            <button class="btn actualizar">Actualizar</button>
-            <button class="btn eliminar" >Eliminar</button>
+            <button class="btn actualizar" (click)="actualizarCliente(cliente)">Actualizar</button>
+            <button class="btn eliminar"  (click)="eliminarCliente(cliente)">Eliminar</button>
           </td>
         </tr>
       }
@@ -46,27 +46,27 @@
 
             <div class="form-group">
               <label for="cc">Número de Documento</label>
-              <input type="number" id="cc" [(ngModel)]="nuevoCliente.cc" name="cc" />
+              <input type="number" id="cc" [(ngModel)]="nuevoCliente.cc" name="cc" placeholder="Ej. 12345678"/>
             </div>
   
             <div class="form-group">
               <label for="nombre">Nombre</label>
-              <input type="text" id="nombre" [(ngModel)]="nuevoCliente.nombre" name="nombre" />
+              <input type="text" id="nombre" [(ngModel)]="nuevoCliente.nombre" name="nombre" placeholder="Ej. Juan"/>
             </div>
   
             <div class="form-group">
               <label for="apellido">Apellido</label>
-              <input type="text" id="apellido" [(ngModel)]="nuevoCliente.apellido" name="apellido" />
+              <input type="text" id="apellido" [(ngModel)]="nuevoCliente.apellido" name="apellido" placeholder="Ej. Perez" />
             </div>
   
             <div class="form-group">
               <label for="telefono">Teléfono</label>
-              <input type="number" id="telefono" [(ngModel)]="nuevoCliente.telefono" name="telefono" />
+              <input type="number" id="telefono" [(ngModel)]="nuevoCliente.telefono" name="telefono" placeholder="Ej. 3001234567"/>
             </div>
   
             <div class="form-group full-width">
               <label for="direccion">Dirección</label>
-              <input type="text" id="direccion" [(ngModel)]="nuevoCliente.direccion" name="direccion" />
+              <input type="text" id="direccion" [(ngModel)]="nuevoCliente.direccion" name="direccion" placeholder="Ej. Calle 110 ..."/>
             </div>
           </div>
   
@@ -75,6 +75,81 @@
             <button type="button" class="btn confirmar" (click)="confirmarAccion()">Guardar</button>
           </div>
         </form>
+      }
+
+      @case ('actualizarCliente') {
+        <form class="form-cliente">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <h3>{{ modalTitle }}</h3>
+            </div>
+        
+            <div class="form-group">
+              <label for="cc">Número de Documento</label>
+              <input
+                type="number"
+                id="cc"
+                [(ngModel)]="clienteSeleccionado.cc"
+                name="cc"
+                placeholder="Ej. 12345678"
+                [readonly]="accion === 'actualizarCliente'"
+              />
+            </div>
+        
+            <div class="form-group">
+              <label for="nombre">Nombre</label>
+              <input
+                type="text"
+                id="nombre"
+                [(ngModel)]="clienteSeleccionado.nombre"
+                name="nombre"
+                placeholder="Ej. Juan"
+              />
+            </div>
+        
+            <div class="form-group">
+              <label for="apellido">Apellido</label>
+              <input
+                type="text"
+                id="apellido"
+                [(ngModel)]="clienteSeleccionado.apellido"
+                name="apellido"
+                placeholder="Ej. Pérez"
+              />
+            </div>
+        
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input
+                type="number"
+                id="telefono"
+                [(ngModel)]="clienteSeleccionado.telefono"
+                name="telefono"
+                placeholder="Ej. 3001234567"
+              />
+            </div>
+        
+            <div class="form-group full-width">
+              <label for="direccion">Dirección</label>
+              <input
+                type="text"
+                id="direccion"
+                [(ngModel)]="clienteSeleccionado.direccion"
+                name="direccion"
+                placeholder="Ej. Calle 110 ..."
+              />
+            </div>
+          </div>
+        
+          <div class="form-actions">
+            <button type="button" class="btn cancelar" (click)="showModal = false">
+              Cancelar
+            </button>
+            <button type="button" class="btn confirmar" (click)="confirmarAccionActualizar()">
+              {{ accion === 'actualizarCliente' ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </div>
+        </form>                  
       }
     }
   </app-modal>

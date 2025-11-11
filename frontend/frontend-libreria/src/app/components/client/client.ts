@@ -15,8 +15,7 @@ interface Cliente {
   selector: 'app-client',
   imports: [FormsModule, Modal],
   templateUrl: './client.html',
-  styleUrls: ['./client.scss'],
-  encapsulation: ViewEncapsulation.None, 
+  styleUrl: './client.scss',
 })
 export class Client implements OnInit {
   showModal = false;
@@ -24,6 +23,14 @@ export class Client implements OnInit {
   modalTitle = '';
 
   nuevoCliente = {
+    cc: null,
+    nombre: '',
+    apellido: '',
+    direccion: '',
+    telefono: null
+  };
+
+  clienteSeleccionado: Cliente = {
     cc: 0,
     nombre: '',
     apellido: '',
@@ -44,7 +51,7 @@ export class Client implements OnInit {
     this.modalTitle = 'Agregar Cliente';
     this.showModal = true;
 
-    this.nuevoCliente = { cc: 0 , nombre: '', apellido: '', direccion: '', telefono: 0 };
+    this.nuevoCliente = { cc: null , nombre: '', apellido: '', direccion: '', telefono: null };
   }
 
   confirmarAccion() {
@@ -64,33 +71,68 @@ export class Client implements OnInit {
   }
 
   actualizarCliente(cliente: Cliente) {
-    const nombre = prompt('Nuevo nombre:', cliente.nombre);
-    const apellido = prompt('Nuevo apellido:', cliente.apellido);
-    const direccion = prompt('Nueva dirección:', cliente.direccion);
-    const telefono = prompt('Nuevo teléfono:', cliente.telefono.toString());
-
-    if (nombre !== null) cliente.nombre = nombre;
-    if (apellido !== null) cliente.apellido = apellido;
-    if (direccion !== null) cliente.direccion = direccion;
-    if (telefono !== null) cliente.telefono = parseInt(telefono, 10);
-
-    alert('✅ Datos del cliente actualizados');
+    this.accion = 'actualizarCliente';
+    this.modalTitle = 'Actualizar Cliente';
+    this.clienteSeleccionado = { ...cliente };
+    this.showModal = true;
   }
 
-  eliminarCliente(cc: string) {
-    if (confirm('¿Está seguro de eliminar este cliente?')) {
-      this.clientes = this.clientes.filter(c => c.cc !== parseInt(cc, 10));
-      alert('🗑️ Cliente eliminado correctamente');
+  confirmarAccionActualizar() {
+    if (this.accion === 'actualizarCliente') {
+      const index = this.clientes.findIndex(c => c.cc === this.clienteSeleccionado.cc);
+      if (index !== -1) {
+        this.clientes[index] = { ...this.clienteSeleccionado };
+        Swal.fire({
+          icon: 'success',
+          title: 'Cliente actualizado',
+          text: 'La información del cliente fue actualizada correctamente.',
+          confirmButtonColor: '#3085d6'
+        });
+      }
+    } else {
+      this.clientes.push({ ...this.clienteSeleccionado });
+      Swal.fire({
+        icon: 'success',
+        title: 'Cliente agregado',
+        text: 'El nuevo cliente fue agregado correctamente.',
+        confirmButtonColor: '#3085d6'
+      });
     }
+    this.limpiarCampos();
+    this.showModal = false;
+  }
+
+  eliminarCliente(cliente: Cliente) {
+    Swal.fire({
+      title: '¿Eliminar cliente?',
+      text: `Se eliminará a ${cliente.nombre} ${cliente.apellido}.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.clientes = this.clientes.filter(c => c.cc !== cliente.cc);
+        Swal.fire({
+          icon: 'success',
+          title: 'Eliminado',
+          text: `El cliente ${cliente.nombre} ha sido eliminado.`,
+          timer: 1800,
+          showConfirmButton: false
+        });
+      }
+    });
   }
 
   limpiarCampos() {
     this.nuevoCliente = {
-      cc: 0,
+      cc: null,
       nombre: '',
       apellido: '',
       direccion: '',
-      telefono: 0
+      telefono: null
     };
   }
 }
