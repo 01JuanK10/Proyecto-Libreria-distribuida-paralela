@@ -1,0 +1,30 @@
+name: CD - Deploy to Render
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build with Maven (backend)
+        working-directory: backend/backend-libreria
+        run: mvn clean install -DskipTests
+
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        run: |
+          echo "Desplegando aplicación a Render..."
+          curl -X POST \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": true}' \
+            https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys
