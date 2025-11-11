@@ -1,16 +1,19 @@
 package com.backend.libreria.informes.service.impl;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.backend.libreria.clientes.entity.Cliente;
 import com.backend.libreria.clientes.repository.IClienteRepository;
+import com.backend.libreria.informes.dto.InformeResponse;
 import com.backend.libreria.informes.service.base.IInformeService;
 import com.backend.libreria.libros.entity.Libro;
 import com.backend.libreria.libros.repository.ILibroRepository;
-import com.backend.libreria.informes.dto.InformeResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
