@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Modal } from '../modal/modal';
+import Swal from 'sweetalert2';
 
 interface Cliente {
   cc: number;
@@ -10,32 +13,54 @@ interface Cliente {
 
 @Component({
   selector: 'app-client',
-  imports: [],
+  imports: [FormsModule, Modal],
   templateUrl: './client.html',
-  styleUrl: './client.scss',
+  styleUrls: ['./client.scss'],
+  encapsulation: ViewEncapsulation.None, 
 })
-export class Client {
+export class Client implements OnInit {
+  showModal = false;
+  accion = '';
+  modalTitle = '';
+
+  nuevoCliente = {
+    cc: 0,
+    nombre: '',
+    apellido: '',
+    direccion: '',
+    telefono: 0
+  };
+
   clientes: Cliente[] = [
     { cc: 10101010, nombre: 'Juan', apellido: 'Pérez', direccion: 'Calle 10 #23-45', telefono: 3001234567 },
     { cc: 20202020, nombre: 'Ana', apellido: 'Gómez', direccion: 'Carrera 5 #67-89', telefono: 3017654321 },
     { cc: 30303030, nombre: 'Carlos', apellido: 'López', direccion: 'Av. 80 #12-34', telefono: 3109876543 }
   ];
 
-  agregarCliente() {
-    const nuevo: Cliente = {
-      cc: parseInt(prompt('Ingrese la cédula del cliente:') || '0', 10),
-      nombre: prompt('Ingrese el nombre del cliente:') || '',
-      apellido: prompt('Ingrese el apellido del cliente:') || '',
-      direccion: prompt('Ingrese la dirección del cliente:') || '',
-      telefono: parseInt(prompt('Ingrese el teléfono del cliente:') || '0', 10)
-    };
+  ngOnInit(): void {}
 
-    if (nuevo.cc && nuevo.nombre.trim()) {
-      this.clientes.push(nuevo);
-      alert('✅ Cliente agregado correctamente');
-    } else {
-      alert('⚠️ Debe ingresar al menos la cédula y el nombre');
-    }
+  agregarCliente() {
+    this.accion = 'agregar';
+    this.modalTitle = 'Agregar Cliente';
+    this.showModal = true;
+
+    this.nuevoCliente = { cc: 0 , nombre: '', apellido: '', direccion: '', telefono: 0 };
+  }
+
+  confirmarAccion() {
+    console.log('Acción confirmada:', this.nuevoCliente);
+    this.limpiarCampos();
+    Swal.fire({
+      icon: 'success',
+      title: 'Cliente agregado',
+      text: `El cliente se ha agregado correctamente.`,
+      confirmButtonColor: '#28a745'
+    });
+    this.cerrarModal();
+  }
+
+  cerrarModal() {
+    this.showModal = false;
   }
 
   actualizarCliente(cliente: Cliente) {
@@ -57,5 +82,15 @@ export class Client {
       this.clientes = this.clientes.filter(c => c.cc !== parseInt(cc, 10));
       alert('🗑️ Cliente eliminado correctamente');
     }
+  }
+
+  limpiarCampos() {
+    this.nuevoCliente = {
+      cc: 0,
+      nombre: '',
+      apellido: '',
+      direccion: '',
+      telefono: 0
+    };
   }
 }
