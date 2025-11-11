@@ -10,6 +10,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: libreria
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U admin -d libreria"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,12 +36,27 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..10}; do
+            if pg_isready -h localhost -p 5432 -U admin; then
+              echo "PostgreSQL está listo"
+              break
+            fi
+            echo "Esperando a PostgreSQL..."
+            sleep 5
+          done
+
       - name: Build with Maven (backend)
         working-directory: backend/backend-libreria
         run: mvn clean install
 
       - name: Run tests with Maven (backend)
         working-directory: backend/backend-libreria
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/libreria
+          SPRING_DATASOURCE_USERNAME: admin
+          SPRING_DATASOURCE_PASSWORD: admin
         run: mvn test
 
       - name: Send failure notification email
