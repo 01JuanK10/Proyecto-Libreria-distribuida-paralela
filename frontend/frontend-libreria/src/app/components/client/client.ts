@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../modal/modal';
 import Swal from 'sweetalert2';
+import { ClientService } from '../../services/client-service';
 
 interface Cliente {
   cc: number;
@@ -18,56 +19,60 @@ interface Cliente {
   styleUrl: './client.scss',
 })
 export class Client implements OnInit {
+  clientes: Cliente[] = [];
   showModal = false;
   accion = '';
   modalTitle = '';
+  nuevoCliente: Cliente = { cc: 0, nombre: '', apellido: '', direccion: '', telefono: 0 };
+  clienteSeleccionado: Cliente = { cc: 0, nombre: '', apellido: '', direccion: '', telefono: 0 };
 
-  nuevoCliente = {
-    cc: null,
-    nombre: '',
-    apellido: '',
-    direccion: '',
-    telefono: null
-  };
+  constructor(private clienteService: ClientService) {}
 
-  clienteSeleccionado: Cliente = {
-    cc: 0,
-    nombre: '',
-    apellido: '',
-    direccion: '',
-    telefono: 0
-  };
+  ngOnInit(): void {
+    this.cargarClientes();
 
-  clientes: Cliente[] = [
-    { cc: 10101010, nombre: 'Juan', apellido: 'Pérez', direccion: 'Calle 10 #23-45', telefono: 3001234567 },
-    { cc: 20202020, nombre: 'Ana', apellido: 'Gómez', direccion: 'Carrera 5 #67-89', telefono: 3017654321 },
-    { cc: 30303030, nombre: 'Carlos', apellido: 'López', direccion: 'Av. 80 #12-34', telefono: 3109876543 }
-  ];
+    this.clienteService.cliente$.subscribe(event => {
+      if (event) {
+        this.cargarClientes();
+      }
+    });
+  }
 
-  ngOnInit(): void {}
+  cargarClientes() {
+    this.clienteService.getAll().subscribe({
+      next: (data) => (this.clientes = data),
+      error: (err) => console.error(err),
+    });
+  }
 
   agregarCliente() {
     this.accion = 'agregar';
     this.modalTitle = 'Agregar Cliente';
     this.showModal = true;
-
-    this.nuevoCliente = { cc: null , nombre: '', apellido: '', direccion: '', telefono: null };
+    this.nuevoCliente = { cc: 0, nombre: '', apellido: '', direccion: '', telefono: 0 };
   }
 
   confirmarAccion() {
-    console.log('Acción confirmada:', this.nuevoCliente);
-    this.limpiarCampos();
-    Swal.fire({
-      icon: 'success',
-      title: 'Cliente agregado',
-      text: `El cliente se ha agregado correctamente.`,
-      confirmButtonColor: '#28a745'
-    });
-    this.cerrarModal();
-  }
+    if (!this.validarCampos(this.nuevoCliente)) return;
 
-  cerrarModal() {
-    this.showModal = false;
+    this.clienteService.create(this.nuevoCliente).subscribe({
+      next: () => {
+        Swal.fire('Cliente agregado', 'El cliente fue agregado correctamente.', 'success');
+        this.cerrarModal
+      },
+      error: (err) => {
+        if (err.message.includes('(400)')) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Cliente existente',
+            text: `Ya existe un cliente con el documento ${this.nuevoCliente.cc}.`,
+            confirmButtonColor: '#d33'
+          });
+        } else {
+          Swal.fire('Error', 'Ocurrió un error al guardar el cliente.', 'error');
+        }
+      }
+    });
   }
 
   actualizarCliente(cliente: Cliente) {
@@ -78,28 +83,15 @@ export class Client implements OnInit {
   }
 
   confirmarAccionActualizar() {
-    if (this.accion === 'actualizarCliente') {
-      const index = this.clientes.findIndex(c => c.cc === this.clienteSeleccionado.cc);
-      if (index !== -1) {
-        this.clientes[index] = { ...this.clienteSeleccionado };
-        Swal.fire({
-          icon: 'success',
-          title: 'Cliente actualizado',
-          text: 'La información del cliente fue actualizada correctamente.',
-          confirmButtonColor: '#3085d6'
-        });
-      }
-    } else {
-      this.clientes.push({ ...this.clienteSeleccionado });
-      Swal.fire({
-        icon: 'success',
-        title: 'Cliente agregado',
-        text: 'El nuevo cliente fue agregado correctamente.',
-        confirmButtonColor: '#3085d6'
-      });
+    if (!this.validarCampos(this.clienteSeleccionado)) {
+      return;
     }
-    this.limpiarCampos();
-    this.showModal = false;
+
+    this.clienteService.update(this.clienteSeleccionado).subscribe(() => {
+      Swal.fire('Cliente actualizado', 'Los datos fueron actualizados correctamente.', 'success');
+      this.cargarClientes();
+      this.cerrarModal();
+    });
   }
 
   eliminarCliente(cliente: Cliente) {
@@ -110,29 +102,57 @@ export class Client implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.clientes = this.clientes.filter(c => c.cc !== cliente.cc);
-        Swal.fire({
-          icon: 'success',
-          title: 'Eliminado',
-          text: `El cliente ${cliente.nombre} ha sido eliminado.`,
-          timer: 1800,
-          showConfirmButton: false
+        this.clienteService.delete(cliente.cc).subscribe(() => {
+          Swal.fire('Eliminado', `El cliente ${cliente.nombre} ha sido eliminado.`, 'success');
+          this.cargarClientes();
         });
       }
     });
   }
 
+  private validarCampos(cliente: Cliente): boolean {
+    if (
+      !cliente.cc ||
+      !cliente.nombre.trim() ||
+      !cliente.apellido.trim() ||
+      !cliente.direccion.trim() ||
+      !cliente.telefono
+    ) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor, completa todos los campos antes de continuar.',
+        confirmButtonColor: '#3085d6',
+      });
+      return false;
+    }
+
+    if (cliente.cc <= 0 || cliente.telefono <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Datos inválidos',
+        text: 'El número de documento y teléfono deben ser mayores que 0.',
+        confirmButtonColor: '#3085d6',
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   limpiarCampos() {
     this.nuevoCliente = {
-      cc: null,
+      cc: 0,
       nombre: '',
       apellido: '',
       direccion: '',
-      telefono: null
+      telefono: 0
     };
+  }
+
+  cerrarModal() {
+    this.showModal = false;
   }
 }
