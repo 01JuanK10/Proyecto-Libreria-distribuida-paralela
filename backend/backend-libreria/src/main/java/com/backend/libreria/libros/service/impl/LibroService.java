@@ -15,12 +15,15 @@ public class LibroService implements ILibroService {
     private final ILibroRepository libroRepository;
 
     @Override
-    public Libro create(Libro libro) throws RuntimeException {
+    public Libro create(Libro libro) {
+        if (libroRepository.existsById(libro.getId())) {
+            throw new RuntimeException("Ya existe un libro con el id: " + libro.getId());
+        }
         return libroRepository.save(libro);
     }
 
     @Override
-    public Libro findById(Long id) throws RuntimeException {
+    public Libro findById(Long id) {
         return libroRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Libro no encontrado con id: " + id));
     }
@@ -31,9 +34,12 @@ public class LibroService implements ILibroService {
     }
 
     @Override
-    public Libro update(Libro libro) throws RuntimeException {
-        Libro existente = libroRepository.findById(libro.getId())
-                .orElseThrow(() -> new RuntimeException("Libro no encontrado con id: " + libro.getId()));
+    public Libro update(Libro libro) {
+        if (!libroRepository.existsById(libro.getId())) {
+            throw new RuntimeException("No se puede actualizar. Libro no encontrado con id: " + libro.getId());
+        }
+
+        Libro existente = libroRepository.findById(libro.getId()).get();
 
         existente.setTitulo(libro.getTitulo());
         existente.setAutor(libro.getAutor());
@@ -45,7 +51,7 @@ public class LibroService implements ILibroService {
     }
 
     @Override
-    public void delete(Long id) throws RuntimeException {
+    public void delete(Long id) {
         if (!libroRepository.existsById(id)) {
             throw new RuntimeException("No se puede eliminar. Libro no encontrado con id: " + id);
         }
