@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../modal/modal';
 import Swal from 'sweetalert2';
@@ -19,7 +19,7 @@ interface Cliente {
   styleUrl: './client.scss',
 })
 export class Client implements OnInit {
-  clientes: Cliente[] = [];
+  clientes = signal<Cliente[]>([]);
   showModal = false;
   accion = '';
   modalTitle = '';
@@ -40,7 +40,7 @@ export class Client implements OnInit {
 
   cargarClientes() {
     this.clienteService.getAll().subscribe({
-      next: (data) => (this.clientes = data),
+      next: (data) => (this.clientes.set(data)),
       error: (err) => console.error(err),
     });
   }

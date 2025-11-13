@@ -19,7 +19,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (libro of libros; track libro.id) {
+        @for (libro of libros(); track libro.id) {
           <tr>
             <td>{{ libro.id }}</td>
             <td>{{ libro.titulo }}</td>
