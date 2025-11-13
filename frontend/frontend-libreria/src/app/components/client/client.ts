@@ -1,4 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Modal } from '../modal/modal';
+import Swal from 'sweetalert2';
+import { ClientService } from '../../services/client-service';
 
 interface Cliente {
   cc: number;
@@ -10,52 +14,145 @@ interface Cliente {
 
 @Component({
   selector: 'app-client',
-  imports: [],
+  imports: [FormsModule, Modal],
   templateUrl: './client.html',
   styleUrl: './client.scss',
 })
-export class Client {
-  clientes: Cliente[] = [
-    { cc: 10101010, nombre: 'Juan', apellido: 'Pérez', direccion: 'Calle 10 #23-45', telefono: 3001234567 },
-    { cc: 20202020, nombre: 'Ana', apellido: 'Gómez', direccion: 'Carrera 5 #67-89', telefono: 3017654321 },
-    { cc: 30303030, nombre: 'Carlos', apellido: 'López', direccion: 'Av. 80 #12-34', telefono: 3109876543 }
-  ];
+export class Client implements OnInit {
+  clientes: Cliente[] = [];
+  showModal = false;
+  accion = '';
+  modalTitle = '';
+  nuevoCliente: Cliente = { cc: 0, nombre: '', apellido: '', direccion: '', telefono: 0 };
+  clienteSeleccionado: Cliente = { cc: 0, nombre: '', apellido: '', direccion: '', telefono: 0 };
+
+  constructor(private clienteService: ClientService) {}
+
+  ngOnInit(): void {
+    this.cargarClientes();
+
+    this.clienteService.cliente$.subscribe(event => {
+      if (event) {
+        this.cargarClientes();
+      }
+    });
+  }
+
+  cargarClientes() {
+    this.clienteService.getAll().subscribe({
+      next: (data) => (this.clientes = data),
+      error: (err) => console.error(err),
+    });
+  }
 
   agregarCliente() {
-    const nuevo: Cliente = {
-      cc: parseInt(prompt('Ingrese la cédula del cliente:') || '0', 10),
-      nombre: prompt('Ingrese el nombre del cliente:') || '',
-      apellido: prompt('Ingrese el apellido del cliente:') || '',
-      direccion: prompt('Ingrese la dirección del cliente:') || '',
-      telefono: parseInt(prompt('Ingrese el teléfono del cliente:') || '0', 10)
-    };
+    this.accion = 'agregar';
+    this.modalTitle = 'Agregar Cliente';
+    this.showModal = true;
+    this.nuevoCliente = { cc: 0, nombre: '', apellido: '', direccion: '', telefono: 0 };
+  }
 
-    if (nuevo.cc && nuevo.nombre.trim()) {
-      this.clientes.push(nuevo);
-      alert('✅ Cliente agregado correctamente');
-    } else {
-      alert('⚠️ Debe ingresar al menos la cédula y el nombre');
-    }
+  confirmarAccion() {
+    if (!this.validarCampos(this.nuevoCliente)) return;
+
+    this.clienteService.create(this.nuevoCliente).subscribe({
+      next: () => {
+        Swal.fire('Cliente agregado', 'El cliente fue agregado correctamente.', 'success');
+        this.cerrarModal();
+      },
+      error: (err) => {
+        if (err.message.includes('(400)')) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Cliente existente',
+            text: `Ya existe un cliente con el documento ${this.nuevoCliente.cc}.`,
+            confirmButtonColor: '#d33'
+          });
+        } else {
+          Swal.fire('Error', 'Ocurrió un error al guardar el cliente.', 'error');
+        }
+      }
+    });
   }
 
   actualizarCliente(cliente: Cliente) {
-    const nombre = prompt('Nuevo nombre:', cliente.nombre);
-    const apellido = prompt('Nuevo apellido:', cliente.apellido);
-    const direccion = prompt('Nueva dirección:', cliente.direccion);
-    const telefono = prompt('Nuevo teléfono:', cliente.telefono.toString());
-
-    if (nombre !== null) cliente.nombre = nombre;
-    if (apellido !== null) cliente.apellido = apellido;
-    if (direccion !== null) cliente.direccion = direccion;
-    if (telefono !== null) cliente.telefono = parseInt(telefono, 10);
-
-    alert('✅ Datos del cliente actualizados');
+    this.accion = 'actualizarCliente';
+    this.modalTitle = 'Actualizar Cliente';
+    this.clienteSeleccionado = { ...cliente };
+    this.showModal = true;
   }
 
-  eliminarCliente(cc: string) {
-    if (confirm('¿Está seguro de eliminar este cliente?')) {
-      this.clientes = this.clientes.filter(c => c.cc !== parseInt(cc, 10));
-      alert('🗑️ Cliente eliminado correctamente');
+  confirmarAccionActualizar() {
+    if (!this.validarCampos(this.clienteSeleccionado)) {
+      return;
     }
+
+    this.clienteService.update(this.clienteSeleccionado).subscribe(() => {
+      Swal.fire('Cliente actualizado', 'Los datos fueron actualizados correctamente.', 'success');
+      this.cargarClientes();
+      this.cerrarModal();
+    });
+  }
+
+  eliminarCliente(cliente: Cliente) {
+    Swal.fire({
+      title: '¿Eliminar cliente?',
+      text: `Se eliminará a ${cliente.nombre} ${cliente.apellido}.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.clienteService.delete(cliente.cc).subscribe(() => {
+          Swal.fire('Eliminado', `El cliente ${cliente.nombre} ha sido eliminado.`, 'success');
+          this.cargarClientes();
+        });
+      }
+    });
+  }
+
+  private validarCampos(cliente: Cliente): boolean {
+    if (
+      !cliente.cc ||
+      !cliente.nombre.trim() ||
+      !cliente.apellido.trim() ||
+      !cliente.direccion.trim() ||
+      !cliente.telefono
+    ) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor, completa todos los campos antes de continuar.',
+        confirmButtonColor: '#3085d6',
+      });
+      return false;
+    }
+
+    if (cliente.cc <= 0 || cliente.telefono <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Datos inválidos',
+        text: 'El número de documento y teléfono deben ser mayores que 0.',
+        confirmButtonColor: '#3085d6',
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  limpiarCampos() {
+    this.nuevoCliente = {
+      cc: 0,
+      nombre: '',
+      apellido: '',
+      direccion: '',
+      telefono: 0
+    };
+  }
+
+  cerrarModal() {
+    this.showModal = false;
   }
 }

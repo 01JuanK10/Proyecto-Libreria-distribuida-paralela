@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../modal/modal';
 import Swal from 'sweetalert2';
+import { BookService } from '../../services/book-service';
+import { ClientService } from '../../services/client-service';
 
 interface Libro {
   id: number;
@@ -25,6 +27,7 @@ interface Cliente {
   styleUrl: './book.scss',
 })
 export class Book implements OnInit {
+  libros: Libro[] = [];
   showModal = false;
   accion = '';
   modalTitle = '';
@@ -34,55 +37,109 @@ export class Book implements OnInit {
     titulo: '',
     autor: '',
     editorial: '',
-    genero: ''
+    genero: '',
+    prestado: false
   };
-
-  libros: Libro[] = [
-    { id: 1, titulo: 'Cien años de soledad', autor: 'Gabriel García Márquez', editorial: 'Sudamericana', genero: 'Realismo mágico', prestado: false },
-    { id: 2, titulo: 'Don Quijote de la Mancha', autor: 'Miguel de Cervantes', editorial: 'Francisco de Robles', genero: 'Novela', prestado: true }
-  ];
-
-  clientes: Cliente[] = [
-    { cc: 101, nombre: 'Laura', apellido: 'Gómez' },
-    { cc: 102, nombre: 'Carlos', apellido: 'Ruiz' }
-  ];
 
   libroId: number | null = null;
   clienteCC: number | null = null;
 
-  libroSeleccionado: Partial<Libro> = { titulo: '', autor: '', editorial: '' };
-  clienteSeleccionado: Partial<Cliente> = { nombre: '', apellido: '' };
+  libroSeleccionado: any = { id: 0, titulo: '', autor: '', editorial: '', genero: '', prestado: false };
+  clienteSeleccionado: any = { nombre: '', apellido: '' };
 
-  ngOnInit(): void {}
+  constructor(private bookService: BookService, private clientService: ClientService) {}
 
+  ngOnInit(): void {
+    this.cargarLibros();
+
+    this.bookService.libro$.subscribe(event => {
+      if (event) this.cargarLibros();
+    });
+  }
+
+  cargarLibros() {
+    this.bookService.getAll().subscribe({
+      next: (data) => (this.libros = data),
+      error: (err) => console.error(err),
+    });
+  }
+
+  // ----------------------Agregar libro-----------------------
   abrirModalNuevoLibro() {
     this.accion = 'agregar';
     this.modalTitle = 'Agregar libro';
     this.showModal = true;
-
-    this.nuevoLibro = { id: '', titulo: '', autor: '', editorial: '', genero: '' };
+    this.nuevoLibro = { id: '', titulo: '', autor: '', editorial: '', genero: '', prestado: false };
   }
 
   confirmarAccion() {
-    console.log('Acción confirmada:', this.nuevoLibro);
-    Swal.fire({
-      icon: 'success',
-      title: 'Libro agregado',
-      text: `El libro "${this.nuevoLibro.titulo}" se ha agregado correctamente.`,
-      confirmButtonColor: '#28a745'
+    const { id, titulo, autor, editorial, genero } = this.nuevoLibro;
+
+    if (!id || !titulo.trim() || !autor.trim() || !editorial.trim() || !genero.trim()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor, completa todos los campos antes de guardar el libro.',
+        confirmButtonColor: '#f0ad4e'
+      });
+      return;
+    }
+
+    if (isNaN(Number(id)) || Number(id) <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'ID inválido',
+        text: 'El ID debe ser un número positivo.',
+        confirmButtonColor: '#f0ad4e'
+      });
+      return;
+    }
+
+    const libroExistente = this.libros.find(l => l.id === Number(id));
+    if (libroExistente) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'ID duplicado',
+        text: `Ya existe un libro con el ID ${id}.`,
+        confirmButtonColor: '#f0ad4e'
+      });
+      return;
+    }
+
+    this.nuevoLibro.prestado = false;
+
+    this.bookService.create(this.nuevoLibro).subscribe({
+      next: (res) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Libro agregado',
+          text: `El libro "${res.titulo}" se ha agregado correctamente.`,
+          confirmButtonColor: '#28a745'
+        });
+        this.bookService.notifyChange();
+        this.cerrarModal();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al agregar libro',
+          text: err.error || 'Ocurrió un error inesperado.',
+          confirmButtonColor: '#d33'
+        });
+      }
     });
-    this.cerrarModal();
   }
 
   cerrarModal() {
     this.showModal = false;
   }
 
-  // 📗 Modal de préstamo
+  // -----------------------Registrar préstamo-----------------------
   registrarPrestamo() {
     this.accion = 'registrarPrestamo';
     this.modalTitle = 'Registrar préstamo de libro';
     this.showModal = true;
+    this.limpiarCampos();
   }
 
   cargarDatosLibro() {
@@ -101,22 +158,34 @@ export class Book implements OnInit {
   }
 
   cargarDatosCliente() {
-    const cliente = this.clientes.find(c => c.cc === this.clienteCC);
-    if (cliente) {
-      this.clienteSeleccionado = cliente;
-    } else {
-      this.clienteSeleccionado = { nombre: '', apellido: '' };
+    if (!this.clienteCC) {
       Swal.fire({
-        icon: 'error',
-        title: 'Cliente no encontrado',
-        text: `No existe ningún cliente con la cédula ${this.clienteCC}.`,
-        confirmButtonColor: '#d33'
+        icon: 'warning',
+        title: 'Cédula no válida',
+        text: 'Debes ingresar una cédula antes de buscar.',
+        confirmButtonColor: '#f0ad4e'
       });
+      return;
     }
+
+    this.clientService.getById(this.clienteCC).subscribe({
+      next: (cliente) => {
+        this.clienteSeleccionado = cliente;
+      },
+      error: () => {
+        this.clienteSeleccionado = { nombre: '', apellido: '' };
+        Swal.fire({
+          icon: 'error',
+          title: 'Cliente no encontrado',
+          text: `No existe ningún cliente con la cédula ${this.clienteCC}.`,
+          confirmButtonColor: '#d33'
+        });
+      }
+    });
   }
 
   confirmarAccionPrestamo() {
-    if (!this.libroSeleccionado?.titulo || !this.clienteSeleccionado?.nombre) {
+    if (!this.libroId || !this.clienteCC) {
       Swal.fire({
         icon: 'warning',
         title: 'Faltan datos',
@@ -126,21 +195,86 @@ export class Book implements OnInit {
       return;
     }
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Nuevo prestamo registrado',
-      text: `El libro se ha prestado correctamente.`,
-      confirmButtonColor: '#28a745'
+    this.bookService.prestarLibro(this.libroId, this.clienteCC).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Préstamo registrado',
+          text: `El libro se ha prestado correctamente.`,
+          confirmButtonColor: '#28a745'
+        });
+        this.bookService.notifyChange();
+        this.cerrarModal();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al registrar préstamo',
+          text: err.error || 'Ocurrió un error inesperado.',
+          confirmButtonColor: '#d33'
+        });
+      }
     });
-    this.cerrarModal();
   }
 
+  // ----------------------Registrar devolución----------------------
   marcarDevuelto() {
-    Swal.fire({
-      icon: 'info',
-      title: 'Devolución registrada',
-      text: 'El libro se ha marcado como devuelto.',
-      confirmButtonColor: '#00bcd4'
+    this.accion = 'registrarDevolucion';
+    this.modalTitle = 'Registrar devolución';
+    this.showModal = true;
+    this.limpiarCampos();
+  }
+
+  confirmarAccionDevolucion() {
+    if (!this.libroId || !this.clienteCC) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Faltan datos',
+        text: 'Debes ingresar IDs válidos para el libro y el cliente antes de registrar la devolución.',
+        confirmButtonColor: '#f0ad4e'
+      });
+      return;
+    }
+
+    const libro = this.libros.find(l => l.id === this.libroId);
+    if (libro && !libro.prestado) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Libro disponible',
+        text: `El libro "${libro.titulo}" ya está disponible.`,
+        confirmButtonColor: '#17a2b8'
+      });
+      return;
+    }
+
+    this.bookService.devolverLibro(this.libroId, this.clienteCC).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Devolución registrada',
+          text: `El libro se ha devuelto correctamente.`,
+          confirmButtonColor: '#28a745'
+        });
+        this.bookService.notifyChange();
+        this.cerrarModal();
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al registrar devolución',
+          text: err.error || 'Ocurrió un error inesperado.',
+          confirmButtonColor: '#d33'
+        });
+      }
     });
+  }
+
+  // ---------------------Limpiar campos---------------------
+  limpiarCampos() {
+    this.nuevoLibro = { id: '', titulo: '', autor: '', editorial: '', genero: '', prestado: false };
+    this.libroId = null;
+    this.clienteCC = null;
+    this.libroSeleccionado = { titulo: '', autor: '', editorial: '' };
+    this.clienteSeleccionado = { nombre: '', apellido: '' };
   }
 }

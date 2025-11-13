@@ -67,15 +67,15 @@
       }
   
       tr:nth-child(odd) {
-        background-color: #fff8ec; // tono claro
+        background-color: #fff8ec;
       }
   
       tr:nth-child(even) {
-        background-color: #f8eedc; // tono más claro y suave
+        background-color: #f8eedc;
       }      
   
       tr:hover {
-        background-color: #f3e6c6; // tono más claro y cálido
+        background-color: #f3e6c6;
         transition: background 0.2s ease;
       }
   
@@ -101,7 +101,7 @@
       text-align: center;
       color: #2b2b2b;
       font-weight: 700;
-      font-size: 1.5rem; // tamaño más grande
+      font-size: 1.5rem;
       margin-bottom: 25px;
       letter-spacing: 0.5px;
       text-transform: uppercase;

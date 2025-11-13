@@ -36,7 +36,7 @@
   </div>
   
   @if (showModal) {
-    <app-modal [isVisible]="showModal" [title]="modalTitle" (cerrar)="showModal = false">
+    <app-modal [isVisible]="showModal" [title]="modalTitle" (close)="cerrarModal()">
       @switch (accion) {
         @case ('agregar') {
           <form class="form-libro">
@@ -83,7 +83,6 @@
             <h3>Registrar Préstamo</h3>
           
             <div class="datos-contenedor">
-              <!-- Columna Libro -->
               <div class="columna">
                 <div class="form-group">
                   <label for="libroId">ID del libro:</label>
@@ -100,19 +99,18 @@
                 <h4>Datos del Libro</h4>
                 <div class="form-group">
                   <label>Título:</label>
-                  <input type="text" [value]="libroSeleccionado.titulo" readonly />
+                  <input type="text" [(ngModel)]="libroSeleccionado.titulo" name="tituloLibro" readonly />
                 </div>
                 <div class="form-group">
                   <label>Autor:</label>
-                  <input type="text" [value]="libroSeleccionado.autor" readonly />
+                  <input type="text" [(ngModel)]="libroSeleccionado.autor" name="autorLibro" readonly />
                 </div>
                 <div class="form-group">
                   <label>Editorial:</label>
-                  <input type="text" [value]="libroSeleccionado.editorial" readonly />
+                  <input type="text" [(ngModel)]="libroSeleccionado.editorial" name="editorialLibro" readonly />
                 </div>
               </div>
           
-              <!-- Columna Cliente -->
               <div class="columna">
                 <div class="form-group">
                   <label for="clienteCC">CC del cliente:</label>
@@ -129,11 +127,11 @@
                 <h4>Datos del Cliente</h4>
                 <div class="form-group">
                   <label>Nombre:</label>
-                  <input type="text" [value]="clienteSeleccionado.nombre" readonly />
+                  <input type="text" [(ngModel)]="clienteSeleccionado.nombre" name="nombreCliente" readonly />
                 </div>
                 <div class="form-group">
                   <label>Apellido:</label>
-                  <input type="text" [value]="clienteSeleccionado.apellido" readonly />
+                  <input type="text" [(ngModel)]="clienteSeleccionado.apellido" name="apellidoCliente" readonly />
                 </div>
               </div>
             </div>
@@ -141,6 +139,71 @@
             <div class="form-actions">
               <button type="button" class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
               <button type="button" class="btn confirmar" (click)="confirmarAccionPrestamo()">Registrar Préstamo</button>
+            </div>
+          </div>          
+        }
+
+        @case ('registrarDevolucion') {
+          <div class="form-prestamo">
+            <h3>Registrar Devolución</h3>
+          
+            <div class="datos-contenedor">
+              <div class="columna">
+                <div class="form-group">
+                  <label for="libroId">ID del libro:</label>
+                  <input
+                    type="number"
+                    id="libroId"
+                    [(ngModel)]="libroId"
+                    name="libroId"
+                    placeholder="Ej. 1"
+                    (change)="cargarDatosLibro()"
+                  />
+                </div>
+          
+                <h4>Datos del Libro</h4>
+                <div class="form-group">
+                  <label>Título:</label>
+                  <input type="text" [(ngModel)]="libroSeleccionado.titulo" name="tituloLibro" readonly />
+                </div>
+                <div class="form-group">
+                  <label>Autor:</label>
+                  <input type="text" [(ngModel)]="libroSeleccionado.autor" name="autorLibro" readonly />
+                </div>
+                <div class="form-group">
+                  <label>Editorial:</label>
+                  <input type="text" [(ngModel)]="libroSeleccionado.editorial" name="editorialLibro" readonly />
+                </div>
+              </div>
+          
+              <div class="columna">
+                <div class="form-group">
+                  <label for="clienteCC">CC del cliente:</label>
+                  <input
+                    type="number"
+                    id="clienteCC"
+                    [(ngModel)]="clienteCC"
+                    name="clienteCC"
+                    placeholder="Ej. 101"
+                    (change)="cargarDatosCliente()"
+                  />
+                </div>
+          
+                <h4>Datos del Cliente</h4>
+                <div class="form-group">
+                  <label>Nombre:</label>
+                  <input type="text" [(ngModel)]="clienteSeleccionado.nombre" name="nombreCliente" readonly />
+                </div>
+                <div class="form-group">
+                  <label>Apellido:</label>
+                  <input type="text" [(ngModel)]="clienteSeleccionado.apellido" name="apellidoCliente" readonly />
+                </div>
+              </div>
+            </div>
+          
+            <div class="form-actions">
+              <button type="button" class="btn cancelar" (click)="cerrarModal()">Cancelar</button>
+              <button type="button" class="btn confirmar" (click)="confirmarAccionDevolucion()">Registrar Devolución</button>
             </div>
           </div>          
         }
