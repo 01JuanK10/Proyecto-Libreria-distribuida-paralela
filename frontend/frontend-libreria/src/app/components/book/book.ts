@@ -106,6 +106,8 @@ export class Book implements OnInit {
       return;
     }
 
+    this.nuevoLibro.prestado = false;
+
     this.bookService.create(this.nuevoLibro).subscribe({
       next: (res) => {
         Swal.fire({
@@ -115,7 +117,6 @@ export class Book implements OnInit {
           confirmButtonColor: '#28a745'
         });
         this.bookService.notifyChange();
-        this.limpiarCampos();
         this.cerrarModal();
       },
       error: (err) => {
@@ -203,7 +204,6 @@ export class Book implements OnInit {
           confirmButtonColor: '#28a745'
         });
         this.bookService.notifyChange();
-        this.limpiarCampos();
         this.cerrarModal();
       },
       error: (err) => {
@@ -256,7 +256,6 @@ export class Book implements OnInit {
           confirmButtonColor: '#28a745'
         });
         this.bookService.notifyChange();
-        this.limpiarCampos();
         this.cerrarModal();
       },
       error: (err) => {

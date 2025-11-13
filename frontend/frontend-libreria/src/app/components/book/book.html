@@ -36,7 +36,7 @@
   </div>
   
   @if (showModal) {
-    <app-modal [isVisible]="showModal" [title]="modalTitle" (cerrar)="showModal = false">
+    <app-modal [isVisible]="showModal" [title]="modalTitle" (close)="cerrarModal()">
       @switch (accion) {
         @case ('agregar') {
           <form class="form-libro">
