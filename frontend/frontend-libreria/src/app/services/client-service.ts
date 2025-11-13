@@ -51,6 +51,10 @@ export class ClientService {
     }
   }
 
+  getById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`);
+  }
+
   // ===================== CREATE =====================
   create(cliente: Cliente): Observable<Cliente> {
     if (this.useMock) {

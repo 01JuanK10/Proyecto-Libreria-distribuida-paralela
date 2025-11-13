@@ -58,7 +58,7 @@ export class Client implements OnInit {
     this.clienteService.create(this.nuevoCliente).subscribe({
       next: () => {
         Swal.fire('Cliente agregado', 'El cliente fue agregado correctamente.', 'success');
-        this.cerrarModal
+        this.cerrarModal();
       },
       error: (err) => {
         if (err.message.includes('(400)')) {
