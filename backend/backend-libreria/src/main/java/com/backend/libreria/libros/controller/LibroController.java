@@ -24,6 +24,7 @@ public class LibroController {
     public ResponseEntity<?> create(@RequestBody LibroRequest request) {
         try {
             Libro libro = new Libro();
+            libro.setId(request.id());
             libro.setTitulo(request.titulo());
             libro.setAutor(request.autor());
             libro.setEditorial(request.editorial());
