@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Modal } from '../modal/modal';
 import Swal from 'sweetalert2';
@@ -27,7 +27,7 @@ interface Cliente {
   styleUrl: './book.scss',
 })
 export class Book implements OnInit {
-  libros: Libro[] = [];
+  libros = signal<Libro[]>([]);
   showModal = false;
   accion = '';
   modalTitle = '';
@@ -59,7 +59,7 @@ export class Book implements OnInit {
 
   cargarLibros() {
     this.bookService.getAll().subscribe({
-      next: (data) => (this.libros = data),
+      next: (data) => (this.libros.set(data)),
       error: (err) => console.error(err),
     });
   }
@@ -95,7 +95,7 @@ export class Book implements OnInit {
       return;
     }
 
-    const libroExistente = this.libros.find(l => l.id === Number(id));
+    const libroExistente = this.libros().find(l => l.id === Number(id));
     if (libroExistente) {
       Swal.fire({
         icon: 'warning',
@@ -143,7 +143,7 @@ export class Book implements OnInit {
   }
 
   cargarDatosLibro() {
-    const libro = this.libros.find(l => l.id === this.libroId);
+    const libro = this.libros().find(l => l.id === this.libroId);
     if (libro) {
       this.libroSeleccionado = libro;
     } else {
@@ -236,7 +236,7 @@ export class Book implements OnInit {
       return;
     }
 
-    const libro = this.libros.find(l => l.id === this.libroId);
+    const libro = this.libros().find(l => l.id === this.libroId);
     if (libro && !libro.prestado) {
       Swal.fire({
         icon: 'info',
