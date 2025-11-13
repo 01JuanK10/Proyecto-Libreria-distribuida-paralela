@@ -12,7 +12,6 @@ import lombok.*;
 @Table(name = "libros")
 public class Libro {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String titulo;
     private String autor;
