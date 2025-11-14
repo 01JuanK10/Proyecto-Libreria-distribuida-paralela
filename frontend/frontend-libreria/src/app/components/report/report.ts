@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { ReportService } from '../../services/report-service';
-import { js2xml } from 'xml-js';
 
 declare const pdfMake: any;
 
@@ -20,13 +19,31 @@ export class Report {
     });
   }
 
+  convertToXML(obj: any, indent: string = ''): string {
+    let xml = '';
+
+    for (let key in obj) {
+      const value = obj[key];
+
+      if (typeof value === 'object' && value !== null) {
+        xml += `${indent}<${key}>\n`;
+        xml += this.convertToXML(value, indent + '  ');
+        xml += `${indent}</${key}>\n`;
+      } else {
+        xml += `${indent}<${key}>${value}</${key}>\n`;
+      }
+    }
+
+    return xml;
+  }
+
   generarInformeXML(data: any) {
-    const xml = js2xml(data, { compact: true, spaces: 2 });
+    const xml = this.convertToXML(data);
 
     const docDefinition = {
       content: [
         { text: 'Árbol XML del Informe', style: 'header' },
-        { text: xml, fontSize: 10 }
+        { text: xml, fontSize: 9 }
       ],
       styles: {
         header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] }
