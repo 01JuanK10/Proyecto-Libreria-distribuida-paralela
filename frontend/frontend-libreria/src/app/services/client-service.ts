@@ -10,7 +10,6 @@ export interface Cliente {
   telefono: number;
 }
 
-// Evento para notificar cambios
 export interface ClienteEvent {
   cliente?: Cliente;
   deletedCc?: number;
@@ -21,7 +20,7 @@ export interface ClienteEvent {
 })
 export class ClientService {
   private http = inject(HttpClient);
-  private baseUrl = 'http://localhost:8080/api/clientes';
+  private baseUrl = 'https://proyecto-libreria-distribuida-paralela.onrender.com/api/clientes';
   private headers = new HttpHeaders({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -36,7 +35,6 @@ export class ClientService {
 
   constructor() {}
 
-  // ===================== GET ALL =====================
   getAll(): Observable<Cliente[]> {
     if (this.useMock) {
       return of(this.clientesMock).pipe(
@@ -55,7 +53,6 @@ export class ClientService {
     return this.http.get<any>(`${this.baseUrl}/${id}`);
   }
 
-  // ===================== CREATE =====================
   create(cliente: Cliente): Observable<Cliente> {
     if (this.useMock) {
       this.clientesMock.push(cliente);
@@ -69,7 +66,6 @@ export class ClientService {
     }
   }
 
-  // ===================== UPDATE =====================
   update(cliente: Cliente): Observable<Cliente> {
     if (this.useMock) {
       const index = this.clientesMock.findIndex(c => c.cc === cliente.cc);
@@ -84,7 +80,6 @@ export class ClientService {
     }
   }
 
-  // ===================== DELETE =====================
   delete(cc: number): Observable<void> {
     if (this.useMock) {
       this.clientesMock = this.clientesMock.filter(c => c.cc !== cc);
