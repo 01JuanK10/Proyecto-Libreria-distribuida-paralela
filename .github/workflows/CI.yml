@@ -56,3 +56,29 @@ jobs:
           SPRING_DATASOURCE_USERNAME: admin
           SPRING_DATASOURCE_PASSWORD: admin
         run: mvn test
+
+      - name: Send failure notification email
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "Falló el build/test de Maven en GitHub Actions"
+          to: juan_alzate82221@elpoli.edu.co, sara_sanchez82221@elpoli.edu.co
+          from: "GitHub Actions <${{ secrets.MAIL_USERNAME }}>"
+          body: |
+            Hola equipo,
+
+            El flujo de integración continua (CI) de GitHub Actions ha fallado en el repositorio:
+            ${{ github.repository }}
+
+            Rama: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Error: Falló el build o los tests de Maven.
+
+            Revisa los logs en: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            --
+            Enviado automáticamente por GitHub Actions

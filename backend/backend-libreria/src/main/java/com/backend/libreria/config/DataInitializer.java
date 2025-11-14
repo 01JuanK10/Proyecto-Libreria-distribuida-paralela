@@ -1,15 +1,17 @@
 package com.backend.libreria.config;
 
-import com.backend.libreria.clientes.entity.Cliente;
-import com.backend.libreria.clientes.repository.IClienteRepository;
-import com.backend.libreria.libros.entity.Libro;
-import com.backend.libreria.libros.repository.ILibroRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+import com.backend.libreria.clientes.entity.Cliente;
+import com.backend.libreria.clientes.repository.IClienteRepository;
+import com.backend.libreria.libros.entity.Libro;
+import com.backend.libreria.libros.repository.ILibroRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -46,33 +48,33 @@ public class DataInitializer {
 
                 // Libros
                 List<Libro> libros = List.of(
-                        new Libro(null, "Cien años de soledad", "Gabriel García Márquez", "Sudamericana", "Novela", true, c1),
-                        new Libro(null, "El amor en los tiempos del cólera", "Gabriel García Márquez", "Oveja Negra", "Novela", true, c1),
-                        new Libro(null, "Crónica de una muerte anunciada", "Gabriel García Márquez", "Sudamericana", "Novela", true, c1),
+                        new Libro(1L, "Cien años de soledad", "Gabriel García Márquez", "Sudamericana", "Novela", true, c1),
+                        new Libro(2L, "El amor en los tiempos del cólera", "Gabriel García Márquez", "Oveja Negra", "Novela", true, c1),
+                        new Libro(3L, "Crónica de una muerte anunciada", "Gabriel García Márquez", "Sudamericana", "Novela", true, c1),
 
-                        new Libro(null, "Breve historia del tiempo", "Stephen Hawking", "Planeta", "Ciencia", true, c2),
-                        new Libro(null, "El universo en una cáscara de nuez", "Stephen Hawking", "Planeta", "Ciencia", true, c2),
+                        new Libro(4L, "Breve historia del tiempo", "Stephen Hawking", "Planeta", "Ciencia", true, c2),
+                        new Libro(5L, "El universo en una cáscara de nuez", "Stephen Hawking", "Planeta", "Ciencia", true, c2),
 
-                        new Libro(null, "La historia del tiempo", "Carl Sagan", "Debate", "Ciencia", false, null),
-                        new Libro(null, "Cosmos", "Carl Sagan", "Planeta", "Ciencia", false, null),
+                        new Libro(6L, "La historia del tiempo", "Carl Sagan", "Debate", "Ciencia", false, null),
+                        new Libro(7L, "Cosmos", "Carl Sagan", "Planeta", "Ciencia", false, null),
 
-                        new Libro(null, "La historia de Roma", "Mary Beard", "Crítica", "Historia", true, c3),
-                        new Libro(null, "Los orígenes del mundo moderno", "Robert Marks", "Ariel", "Historia", false, null),
-                        new Libro(null, "La Segunda Guerra Mundial", "Antony Beevor", "Crítica", "Historia", false, null),
+                        new Libro(8L, "La historia de Roma", "Mary Beard", "Crítica", "Historia", true, c3),
+                        new Libro(9L, "Los orígenes del mundo moderno", "Robert Marks", "Ariel", "Historia", false, null),
+                        new Libro(10L, "La Segunda Guerra Mundial", "Antony Beevor", "Crítica", "Historia", false, null),
 
-                        new Libro(null, "1984", "George Orwell", "Secker & Warburg", "Distopía", false, null),
-                        new Libro(null, "Rebelión en la granja", "George Orwell", "Penguin", "Distopía", false, null),
+                        new Libro(11L, "1984", "George Orwell", "Secker & Warburg", "Distopía", false, null),
+                        new Libro(12L, "Rebelión en la granja", "George Orwell", "Penguin", "Distopía", false, null),
 
-                        new Libro(null, "Física para todos", "Paul Hewitt", "Pearson", "Ciencia", true, c3),
-                        new Libro(null, "El origen de las especies", "Charles Darwin", "Murray", "Ciencia", false, null),
+                        new Libro(13L, "Física para todos", "Paul Hewitt", "Pearson", "Ciencia", true, c3),
+                        new Libro(14L, "El origen de las especies", "Charles Darwin", "Murray", "Ciencia", false, null),
 
-                        new Libro(null, "La Iliada", "Homero", "Alianza", "Historia", false, null),
-                        new Libro(null, "La Odisea", "Homero", "Alianza", "Historia", false, null),
+                        new Libro(15L, "La Iliada", "Homero", "Alianza", "Historia", false, null),
+                        new Libro(16L, "La Odisea", "Homero", "Alianza", "Historia", false, null),
 
-                        new Libro(null, "El principito", "Antoine de Saint-Exupéry", "Reynal & Hitchcock", "Fábula", false, null),
-                        new Libro(null, "Don Quijote de la Mancha", "Miguel de Cervantes", "Espasa", "Novela", true, c2),
-                        new Libro(null, "Rayuela", "Julio Cortázar", "Sudamericana", "Novela", true, c3),
-                        new Libro(null, "Pedro Páramo", "Juan Rulfo", "Fondo de Cultura Económica", "Novela", false, null)
+                        new Libro(17L, "El principito", "Antoine de Saint-Exupéry", "Reynal & Hitchcock", "Fábula", false, null),
+                        new Libro(18L, "Don Quijote de la Mancha", "Miguel de Cervantes", "Espasa", "Novela", true, c2),
+                        new Libro(19L, "Rayuela", "Julio Cortázar", "Sudamericana", "Novela", true, c3),
+                        new Libro(20L, "Pedro Páramo", "Juan Rulfo", "Fondo de Cultura Económica", "Novela", false, null)
                 );
 
                 libroRepository.saveAll(libros);
