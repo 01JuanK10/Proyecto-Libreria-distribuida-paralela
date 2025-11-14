@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ReportService {
-  private apiUrl = 'http://localhost:8080/api/informes';
+  private apiUrl = 'https://proyecto-libreria-distribuida-paralela.onrender.com/api/informes';
 
   constructor(private http: HttpClient) { }
 
