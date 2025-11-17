@@ -14,7 +14,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**") // permite todas las rutas
-                        .allowedOrigins("http://localhost:4200", "https://tu-dominio-en-la-nube.com") // orígenes permitidos
+                        .allowedOrigins("http://localhost:4200", "https://proyecto-libreria-distribuida-paralela-sl93.onrender.com") // orígenes permitidos
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
