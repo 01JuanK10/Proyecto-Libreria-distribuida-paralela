@@ -144,7 +144,7 @@
         }
 
         @case ('registrarDevolucion') {
-          <div class="form-prestamo">
+          <div class="form-devolucion">
             <h3>Registrar Devolución</h3>
           
             <div class="datos-contenedor">
@@ -173,30 +173,6 @@
                 <div class="form-group">
                   <label>Editorial:</label>
                   <input type="text" [(ngModel)]="libroSeleccionado.editorial" name="editorialLibro" readonly />
-                </div>
-              </div>
-          
-              <div class="columna">
-                <div class="form-group">
-                  <label for="clienteCC">CC del cliente:</label>
-                  <input
-                    type="number"
-                    id="clienteCC"
-                    [(ngModel)]="clienteCC"
-                    name="clienteCC"
-                    placeholder="Ej. 101"
-                    (change)="cargarDatosCliente()"
-                  />
-                </div>
-          
-                <h4>Datos del Cliente</h4>
-                <div class="form-group">
-                  <label>Nombre:</label>
-                  <input type="text" [(ngModel)]="clienteSeleccionado.nombre" name="nombreCliente" readonly />
-                </div>
-                <div class="form-group">
-                  <label>Apellido:</label>
-                  <input type="text" [(ngModel)]="clienteSeleccionado.apellido" name="apellidoCliente" readonly />
                 </div>
               </div>
             </div>
