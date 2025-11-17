@@ -226,11 +226,11 @@ export class Book implements OnInit {
   }
 
   confirmarAccionDevolucion() {
-    if (!this.libroId || !this.clienteCC) {
+    if (!this.libroId) {
       Swal.fire({
         icon: 'warning',
         title: 'Faltan datos',
-        text: 'Debes ingresar IDs válidos para el libro y el cliente antes de registrar la devolución.',
+        text: 'Debes ingresar IDs válidos para el libro antes de registrar la devolución.',
         confirmButtonColor: '#f0ad4e'
       });
       return;
@@ -247,7 +247,7 @@ export class Book implements OnInit {
       return;
     }
 
-    this.bookService.devolverLibro(this.libroId, this.clienteCC).subscribe({
+    this.bookService.devolverLibro(this.libroId).subscribe({
       next: () => {
         Swal.fire({
           icon: 'success',
