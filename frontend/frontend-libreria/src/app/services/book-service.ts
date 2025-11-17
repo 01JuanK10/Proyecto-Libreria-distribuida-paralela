@@ -38,8 +38,8 @@ export class BookService {
     return this.http.post<any>(`${this.apiUrl}/prestar`, requestBody);
   }
 
-  devolverLibro(libroId: number, clienteCc: number): Observable<any> {
-    const requestBody = { libroId, clienteCc };
+  devolverLibro(libroId: number): Observable<any> {
+    const requestBody = { libroId};
     return this.http.post<any>(`${this.apiUrl}/devolver`, requestBody);
   }
 
